@@ -18,4 +18,13 @@
 		echo json_encode($result);
 	}
 
+	function getFlashcard($id) {
+		$dbQuery = sprintf("SELECT id,question,answer FROM flashcard WHERE id = '%s'",
+			mysql_real_escape_string($id));
+		$result=getDBResultRecord($dbQuery);
+		header("Content-type: application/json");
+		echo json_encode($result);
+	}
+
+
 ?>
