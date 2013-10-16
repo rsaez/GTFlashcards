@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<api>
+	<description>
+		<![CDATA[This is an API to interact with flashcard db]]>
+	</description>
+
+	<command id='tag' security='protected'>
+		<description><![CDATA[This simple API lets you search flashcards by tags]]></description>
+		
+		<index>
+			<description><![CDATA[This is how you can get a listing of all tags]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[listTags();]]></action>
+		</index>
+
+	</command>
+
+	<command id='flashcard' security='protected'>
+		<description><![CDATA[This simple API lets you add and remove flashcard]]></description>
+		
+		<index>
+			<description><![CDATA[This is how you can get a listing of all flashcards]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[listFlashcards();]]></action>
+		</index>
+		
+		<get>
+			<description><![CDATA[This is how you can get a specific flashcard]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[getFlashcard($_REST['flashcard']);]]></action>
+		</get>
+		
+		<post>
+			<description><![CDATA[This is how you can create a flashcard]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[addFlashcard($_POST['flashcardQuestion'],$_POST['flashcardAnswer']);]]></action>
+		</post>
+		
+		<put>
+			<description><![CDATA[This is how you can update a flashcard]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[updateComment($_REST['flashcard'],$_POST['flashcardQuestion'],$_POST['flashcardAnswer']);]]></action>
+		</put>
+		
+		<delete>
+			<description><![CDATA[This is how you can delete a flashcard]]></description>
+			
+			<action file='gtflashcards.php'><![CDATA[deleteComment($_REST['flashcards']);]]></action>
+		</delete>
+	</command>
+</api>
