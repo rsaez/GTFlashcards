@@ -33,7 +33,7 @@
 		<post>
 			<description><![CDATA[This is how you can create a flashcard]]></description>
 			
-			<action file='gtflashcards.php'><![CDATA[addFlashcard($_POST['flashcardQuestion'],$_POST['flashcardAnswer']);]]></action>
+			<action file='gtflashcards.php'><![CDATA[addFlashcard($_POST['title'],$_POST['question'],$_POST['answer']);]]></action>
 		</post>
 		
 		<put>
