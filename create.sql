@@ -22,8 +22,8 @@ name varchar(100)
 create table account(
 id int auto_increment  primary key,
 username varchar(100) unique,
-userpassword varchar(100),
-userroleid int not null default 1,
+password varchar(100),
+roleid int not null default 1,
 foreign key (userroleid) references accountrole(id)
 );
 
@@ -31,7 +31,7 @@ create table sessions(
 id int auto_increment  primary key,
 accountid int,
 foreign key (accountid) references account(id),
-sessionstring varchar(50)
+sessionid varchar(50)
 );
 
 create table flashcard(

@@ -48,3 +48,6 @@ values(3, 2);
 
 insert into tagtable(tagid, flashcardid)
 values(3, 3);
+
+insert into sessions(accountid, sessionid)
+values(1, 'abc123');
