@@ -5,111 +5,206 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
-		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-		<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-		
-		<link rel="stylesheet" href="gtflash.css" />
-		<script src="gtflash.js"></script>
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+
+		<link rel="stylesheet" href="gtflashcards.css" />
+		<script src="gtflashcards.js"></script>
 		
 	</head>
 	<body>
 
-		<!-- Card front page -->
-		<div data-role="page" id="cardFront" data-theme="d">
+		
+		<!-------------------Decks page---------------------->
+		<div data-role="page" id="decks_page" data-theme="d">
+			<div data-role="header">
+				<a href="#cloud_page" data-role="button" data-theme="b">Browse Cloud</a>
+				<h1>My Decks</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
 			<div data-role="content">
-				<div id="buttonBar">
-					<div class="float-left">
-						<a href="#decks" data-role="button" data-icon="bars" data-inline="true" data-mini="true">Decks</a>
+				<!--<a href="#" class="float-right" data-role="button" data-theme="c" data-inline="true">Browse Cloud</a>-->
+				<ul data-role="listview" data-filter="true" data-filter-placeholder="Search decks..." data-inset="true">
+					<li><a href="#deck_page">CS 4261</a></li>
+					<li><a href="#">CS 1331</a></li>
+					<li><a href="#">MATH 3251</a></li>
+					<li><a href="#">All Flashcards</a></li>
+				</ul>
+			</div>
+			<hr>
+		</div>
+		
+		<!-------------------Options dialog---------------------->
+		<div data-role="page" id="options_dialog" data-theme="d">
+			<div data-role="header">
+				<h1>Options</h1>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview">
+					<li data-icon="false">
+						<a href="#new_deck_dialog" data-rel="dialog">New Deck</a>
+					<li data-icon="false"><a href="#">Sign Out</a></li>
+				</ul>
+			</div>
+		</div>
+		
+		<!-------------------New Deck dialog---------------------->
+		<div data-role="page" id="new_deck_dialog" data-theme="d">
+			<div data-role="header">
+				<h1>Create New Deck</h1>
+			</div>
+			<div data-role="content">
+				<form>
+					<div style="padding:10px 20px;">
+						<h3>Deck Name:</h3>
+						<input type="text" name="user" id="deckName" value="" placeholder="Name" data-theme="a">
+						<button type="submit" data-theme="b">Create New Deck</button>
 					</div>
-					<div class="float-right">
-						<a href="#" data-role="button" data-icon="plus" data-inline="true" data-mini="true">New</a>
-						<a href="#" data-role="button" data-icon="forward" data-inline="true" data-mini="true">Share</a>
-						<a href="#" data-role="button" data-icon="delete" data-inline="true" data-mini="true">Delete</a>
-						<a href="#" data-role="button" data-icon="edit" data-inline="true" data-mini="true">Edit</a>
-					</div>
-					<div style="clear:both"></div>
+				</form>
+			</div>
+		</div>
+		
+		<!-------------------Filters dialog---------------------->
+		<div data-role="page" id="filters_dialog" data-theme="d">
+			<div data-role="header">
+				<h1>Filters</h1>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-divider-theme="d">
+					<li data-role="list-divider">Tags</li>
+					<li>
+						<fieldset data-role="controlgroup" data-corners="false">
+							<label><input type="checkbox">Android</label>
+							<label><input type="checkbox">iOS</label>
+							<label><input type="checkbox">WebDev</label>
+						</fieldset>
+					</li>
+				</ul>
+			</div>
+		</div>
+		
+		<!-------------------Deck page---------------------->
+		<!-- add shuffle button -->
+		<div data-role="page" id="deck_page" data-theme="d">
+			<div data-role="header">
+				<a href="#decks_page" data-role="button" data-icon="arrow-l">My Decks</a>
+				<h1>CS 4261</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
+			<div data-role="content">
+				<a id="filter_button" href="#filters_dialog" data-rel="dialog" data-role="button" data-icon="grid" data-inline="true">Filter</a>
+				<div id="flashcardListPane">
+					<!--<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search flashcards...">
+						<li><a href="#card_front_page">Sample Flashcard</a></li>
+						<li><a href="#">Sample Flashcard 2</a></li>
+						<li><a href="#">Sample Flashcard 3</a></li>
+					</ul>-->
+					<ul id="flashcard_list" data-role="listview" data-inset="true" data-filter="true">
+						<script id="flashcard_list_row_template" type="text/x-jquery-tmpl">
+							<li class="flashcard_list_row" id="flashcard_${id}">
+								<a href='#flashcard_page&flashcard_id=${id}' data-transition="slide">${question}</a>
+							</li>
+						</script>
+					</ul>
 				</div>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+		
+		<!-------------------Card Front page---------------------->
+		<div data-role="page" id="card_front_page" data-theme="d">
+			<div data-role="header">
+				<a href="#deck_page" data-role="button" data-icon="arrow-l">Deck</a>
+				<h1>Sample Flashcard</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
+			<div data-role="content">
+				<div id="tags">Tags: cs4261, Android, Flashcards, anotherTag</div>
 				<div id="cardContent">
+					<br>
 					<br>
 					<br>
 					<h1>Sample Flashcard</h1>
 					<br>
 					<br>
-					<br>
 				</div>
-				<div id="tags">Tags: cs4261, Android, Flashcards, anotherTag</div>
+				<a href="#" class="float-right" data-icon="check" data-role="button" data-theme="c" data-inline="true">Known</a>
 			</div>
 			<hr>
 		</div>
 		
-		<!-- Card back page -->
-		<div data-role="page" id="cardBack" data-theme="d">
+		<!-------------------Card Back page---------------------->
+		<div data-role="page" id="card_back_page" data-theme="d">
+			<div data-role="header">
+				<a href="#deck_page" data-role="button" data-icon="arrow-l">Deck</a>
+				<h1>Sample Flashcard</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
 			<div data-role="content">
-				<div id="buttonBar">
-					<div class="float-left">
-						<a href="#decks" data-role="button" data-icon="bars" data-inline="true" data-mini="true">Decks</a>
-					</div>
-					<div class="float-right">
-						<a href="#" data-role="button" data-icon="plus" data-inline="true" data-mini="true">New</a>
-						<a href="#" data-role="button" data-icon="forward" data-inline="true" data-mini="true">Share</a>
-						<a href="#" data-role="button" data-icon="delete" data-inline="true" data-mini="true">Delete</a>
-						<a href="#" data-role="button" data-icon="edit" data-inline="true" data-mini="true">Edit</a>
-					</div>
-					<div style="clear:both"></div>
-				</div>
+				<div id="tags">Tags: cs4261, Android, Flashcards, anotherTag</div>
 				<div id="cardContent">
 					<br>
 					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 					<br>
 					<br>
 				</div>
-				<div id="tags">Tags: cs4261, Android, Flashcards, anotherTag</div>
+				<a href="#" class="float-right" data-icon="check" data-role="button" data-theme="c" data-inline="true">Known</a>
 			</div>
 			<hr>
 		</div>
-
-		<!-- Decks page -->
-		<div data-role="page" id="decks" data-theme="d">
-			<div data-role="content">
-				<div id="buttonBar">
-					<div class="float-left">
-						<input type="search" name="password" id="search" value="" placeholder="Search...">
-					</div>
-					<div class="float-right">
-						<a href="#" data-role="button" data-inline="true" data-mini="true">Select All</a>
-						<!--<a href="#" data-role="button" data-inline="true" data-mini="true">Add to Deck</a>-->
-						<a href="#" data-role="button" data-icon="search" data-inline="true" data-mini="true">Cloud</a>
-						<a href="#" data-role="button" data-icon="plus" data-inline="true" data-mini="true">New Card</a>
-						<!--<a href="#" data-role="button" data-icon="forward" data-inline="true" data-mini="true">Share</a>
-						<a href="#" data-role="button" data-icon="delete" data-inline="true" data-mini="true">Delete</a>-->
-					</div>
-					<div style="clear:both"></div>
-				</div>
-				<div id="deckPane" class="float-left">
-					<div id="deckHeading">Decks</div>
-					<ul id="deckList" data-role="listview" data-corners="false" data-theme="c" data-inset="true">
-						<li data-icon="false"><a href="#">CS 4261 <span class="ui-li-count">100</span></a></li>
-						<li data-icon="false"><a href="#">CS 1331 <span class="ui-li-count">62</span></a></li>
-						<li data-icon="false"><a href="#">MATH 3215 <span class="ui-li-count">40</span></a></li>
-						<li data-icon="false"><a href="#">Uncategorized <span class="ui-li-count">8</span></a></li>
-					</ul>
-				</div>
-				<div id="flashcardPane" class="float-right">
-					<ul id="flashcardList" data-role="listview" data-corners="false" data-inset="true">
-						<li>
-							<a href="#cardFront"><label data-corners="false"><input type="checkbox" name="checkbox-2"></label>Sample Flashcard 1</a>
-						</li>
-						<li>
-							<a href="#"><label><input type="checkbox" name="checkbox-2"></label>Sample Flashcard 2</a>
-						</li>
-						<li>
-							<a href="#"><label><input type="checkbox" name="checkbox-3"></label>Sample Flashcard 3</a>
-						</li>
-					</ul>
-				</div>
-				<div style="clear:both"></div>
+		
+		<!-------------------Cloud page---------------------->
+		<div data-role="page" id="cloud_page" data-theme="d">
+			<div data-role="header" data-theme="b">
+				<a href="#decks_page" data-role="button" data-theme="a">My Decks</a>
+				<h1>Browse Cloud</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
 			</div>
+			<div data-role="content">
+				<h2>Browse...</h2>
+				<ul data-role="listview" data-inset="true">
+					<li><a href="#cloud_most_popular_page">Most Popular Decks</a></li>
+					<li><a href="#cloud_courses_page">GT Courses</a></li>
+					<li><a href="#">Tags</a></li>
+					<li><a href="#">Users</a></li>
+				</ul>
+			</div>
+			<hr>
+		</div>
+		
+		<!-------------------Cloud Most Popular page---------------------->
+		<div data-role="page" id="cloud_most_popular_page" data-theme="d">
+			<div data-role="header"  data-theme="b">
+				<a href="#cloud_page" data-role="button" data-icon="arrow-l">Cloud</a>
+				<h1>Most Popular Decks</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-filter="true" data-filter-placeholder="Search decks..." data-inset="true">
+					<li><a href="#">CS 4261</a></li>
+					<li><a href="#">CS 1331</a></li>
+					<li><a href="#">MATH 3251</a></li>
+				</ul>
+			</div>
+			<hr>
+		</div>
+		
+		<!-------------------Cloud GT Courses page---------------------->
+		<div data-role="page" id="cloud_courses_page" data-theme="d">
+			<div data-role="header"  data-theme="b">
+				<a href="#cloud_page" data-role="button" data-icon="arrow-l">Cloud</a>
+				<h1>GT Courses</h1>
+				<a href="#options_dialog" data-rel="dialog" data-icon="gear">Options</a>
+			</div>
+			<div data-role="content">
+				<ul data-role="listview" data-filter="true" data-filter-placeholder="Search courses..." data-inset="true">
+					<li><a href="#">CS 4261</a></li>
+					<li><a href="#">CS 1331</a></li>
+					<li><a href="#">MATH 3251</a></li>
+				</ul>
+			</div>
+			<hr>
 		</div>
 		
 	</body>

@@ -1,6 +1,3 @@
-#buttonBar {
-	margin: 15px;
-}
 
 #cardContent {
 	text-align: center;
@@ -9,45 +6,34 @@
 	color: #aaa;
 	font-size: 12px;
 }
-#deckPane {
-	width: 25%;
-	background: #eee;
+
+#filter_panel .ui-li-static {
+	padding: 0;
 }
-#deckHeading {
-	font-size: 16px;
-	font-weight: bold;
-	margin: 10px;
-}
-#deckList {
-	margin: 0;	
-}
-#deckList li {
-	font-weight: normal;	
-}
-#flashcardPane {
-	width: 75%;
-}
-#flashcardPane .ui-bar {
-	border: 1px solid #aaa;
-}
-#flashcardList {
+#filter_panel .ui-controlgroup {
 	margin: 0;
 }
-#flashcardList label {
-	border: none;
-	width: 40px;
-	margin: 0;
+
+#flashcardListPane  {
+	margin-top: 15px;
 }
-#flashcardList .ui-checkbox {
-	float: left;
+
+#bottom_button_bar {
+	width: 80%;
+	margin: 0 auto;
 }
+
+#options_popup {
+	min-width: 180px;
+}
+
+#filter_button {
+	margin-left: 0;
+}
+
 .float-left {
 	float: left;
 }
 .float-right {
 	float: right;
-}
-
-.ui-content {
-	padding: 0px;
 }
