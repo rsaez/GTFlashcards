@@ -1,0 +1,39 @@
+
+#cardContent {
+	text-align: center;
+}
+#tags {
+	color: #aaa;
+	font-size: 12px;
+}
+
+#filter_panel .ui-li-static {
+	padding: 0;
+}
+#filter_panel .ui-controlgroup {
+	margin: 0;
+}
+
+#flashcardListPane  {
+	margin-top: 15px;
+}
+
+#bottom_button_bar {
+	width: 80%;
+	margin: 0 auto;
+}
+
+#options_popup {
+	min-width: 180px;
+}
+
+#filter_button {
+	margin-left: 0;
+}
+
+.float-left {
+	float: left;
+}
+.float-right {
+	float: right;
+}
