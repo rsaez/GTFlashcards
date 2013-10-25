@@ -57,7 +57,19 @@
 
 	</command>
 
-
+	<command id='shuffle_flashcards' security='protected'>
+		<description><![CDATA[This API lets you shuffle flashcards]]></description>
+		
+		<index>
+			<description><![CDATA[List all public flashcards]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				shuffleFlashcards();
+				]]>
+			</action>
+		</index>
+	</command>
 
 	<command id='tag' security='protected'>
 		<description><![CDATA[This API lets you list/create/delete tags]]></description>
@@ -189,6 +201,26 @@
 			<action file='gtflashcards.php'>
 				<![CDATA[
 				cardsInDeck($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='shuffle_deck' security='protected'>
+		<description><![CDATA[This API lets you shuffle flashcards in a specific deck]]></description>
+		
+		<index>
+			<description><![CDATA[Indexing is DISABLED, if a deck is not specified]]></description>
+			
+		</index>
+
+		<post>
+			<description><![CDATA[Shuffle flashcards in a deck, POST parameter [deck_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				shuffleDeck($_POST['deck_id']);
 				]]>
 			</action>
 		</post>

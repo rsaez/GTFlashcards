@@ -67,6 +67,14 @@
 		echo json_encode($result);
 	}
 
+	function shuffleFlashcards() {
+		$dbQuery = sprintf("SELECT id,title,question,answer FROM flashcard");
+		$result = getDBResultsArray($dbQuery);
+		shuffle($result);
+		error_log("test");
+		header("Content-type: application/json");
+		echo json_encode($result);
+	}
 
 	function listTags() {
 		$dbQuery = sprintf("SELECT id,label FROM tag");
@@ -161,7 +169,20 @@
 		echo json_encode($result);
 	}
 
-	
+	function shuffleDeck($deck_id) {
+
+		checkDeckPermission($deck_id);
+
+		global $_USER;
+		$dbQuery = sprintf("SELECT id,title,question,answer FROM flashcard INNER JOIN deck_card_relation ON deck_id = '%s' AND flashcard_id = id",
+			mysql_real_escape_string($deck_id));
+
+		$result = getDBResultsArray($dbQuery);
+		shuffle($result);
+		header("Content-type: application/json");
+		echo json_encode($result);
+	}
+
 	function createDeck($name) {
 		global $_USER;
 		$dbQuery = sprintf("INSERT INTO deck (name,uid) VALUES ('%s','%s')",
