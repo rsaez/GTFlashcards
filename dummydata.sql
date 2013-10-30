@@ -1,53 +1,38 @@
-insert into accountrole(name)
-values('User');
-
-insert into account (username, userpassword, userroleid)
+insert into account (uid, userpassword, roleid)
 values('Sebastian', 'secret', 1);
 
 insert into flashcard(title, question, answer)
 values ('Sweden', 'What is the capital of Sweden?', 'Stockholm');
 
-insert into flashcardtable(accountid, flashcardid)
-values(1, 1);
+insert into cardInAccount(uid, flashcardid)
+values('Sebastian', 1);
 
 insert into flashcard(title, question, answer)
 values ('Karlskrona', 'What year was Karlskrona founded?', '1680');
 
-insert into flashcardtable(accountid, flashcardid)
-values(1, 2);
+insert into cardInAccount(uid, flashcardid)
+values('Sebastian', 2);
 
 insert into flashcard(title, question, answer)
 values ('Karlskrona', 'Who founded Karlskrona?', 'Karl XI of Sweden');
 
-insert into flashcardtable(accountid, flashcardid)
-values(1, 3);
+insert into cardInAccount(uid, flashcardid)
+values('Sebastian', 3);
+
+insert into tag(label, flashcardid)
+values ('Sweden, 1');
+
+insert into tag(label, flashcardid)
+values ('Sweden, 2');
+
+insert into tag(label, flashcardid)
+values ('Sweden, 3');
+
+insert into tag(label, flashcardid)
+values ('Stockholm, 1');
 
 insert into tag(label)
-values ('Sweden');
-
-insert into tagtable(tagid, flashcardid)
-values(1, 1);
-
-insert into tagtable(tagid, flashcardid)
-values(1, 2);
-
-insert into tagtable(tagid, flashcardid)
-values(1, 3);
+values ('Karlskrona, 2');
 
 insert into tag(label)
-values ('Stockholm');
-
-insert into tagtable(tagid, flashcardid)
-values(2, 1);
-
-insert into tag(label)
-values ('Karlskrona');
-
-insert into tagtable(tagid, flashcardid)
-values(3, 2);
-
-insert into tagtable(tagid, flashcardid)
-values(3, 3);
-
-insert into sessions(accountid, sessionid)
-values(1, 'abc123');
+values ('Karlskrona, 3');
