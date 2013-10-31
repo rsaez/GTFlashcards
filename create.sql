@@ -49,9 +49,9 @@ relation int
 );
 
 create table tag(
-id int auto_increment primary key,
+#id int auto_increment primary key,
 label varchar(50) primary key,
-flashcard_id int,
+flashcard_id int
 );
 
 create table deck(
