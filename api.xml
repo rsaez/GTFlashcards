@@ -4,7 +4,85 @@
 		<![CDATA[This is an API to interact with flashcard db]]>
 	</description>
 
+	<command id='account' security='protected'>
+		<description><![CDATA[This API checks if the account(uid) exits, if not, adds it to database]]></description>
 
+		<index>
+			<description><![CDATA[Check account, return uid and roleid]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				checkAccount();
+				]]>
+			</action>
+		</index>
+
+	</command>
+
+	<command id='course' security='protected'>
+
+		<description><![CDATA[This API lets you list all course info]]></description>
+		<index>
+			<description><![CDATA[List all course departments]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				listCourseDept();
+				]]>
+			</action>
+		</index>
+
+		<post>
+			<description><![CDATA[List all course codes under a specific course department, POST parameters [dept]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				listCourseCode($_POST['dept']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='count' security='protected'>
+		<description><![CDATA[This API lets you count the number of flashcards under a specific course (dept, code)]]></description>
+		<index>
+			<description><![CDATA[Counts all flashcards if course (dept, code) is not specific]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				countAll();
+				]]>
+			</action>
+		</index>
+
+		<post>
+			<description><![CDATA[Count all flashcards under a specific course department, POST parameters [dept, code]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				countInCourse($_POST['dept'], $_POST['code']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='cards_in_course' security='protected'>
+		<description><![CDATA[This API lets you list public flashcards under a specific course (dept, code)]]></description>
+		<index>
+			<description><![CDATA[DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[List all public flashcards under a specific course department, POST parameters [dept, code]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				cardsInCourse($_POST['dept'], $_POST['code']);
+				]]>
+			</action>
+		</post>
+
+	</command>
 
 	<command id='flashcard' security='protected'>
 		<description><![CDATA[This API lets you list/add/edit/delete flashcard]]></description>
@@ -20,8 +98,11 @@
 		</index>
 		
 		<get>
-			<description><![CDATA[Retrieve a flashcard with id, REST parameter [flashcard]]]></description>
-			
+			<description><![CDATA[
+				Retrieve a flashcard with id, REST parameter [flashcard]<br>
+				Return Format [question, answer, course_dept, course_code, creator(uid or 'anonymous'), private(0 or 1), upvotes, downvotes]
+				]]></description>
+
 			<action file='gtflashcards.php'>
 				<![CDATA[
 				getFlashcard($_REST['flashcard']);
@@ -30,22 +111,16 @@
 		</get>
 		
 		<post>
-			<description><![CDATA[Add a flashcard, POST parameters [title, question, answer]]]></description>
+			<description><![CDATA[Add a flashcard, POST parameters [question, answer, course_dept, course_code, private(0 or 1), anonymous(0 & 1)]]]></description>
 			
 			<action file='gtflashcards.php'>
 				<![CDATA[
-				addFlashcard($_POST['title'],$_POST['question'],$_POST['answer']);]]>
+				addFlashcard($_POST['question'],$_POST['answer'],$_POST['course_dept'],$_POST['course_code'],$_POST['private'],$_POST['anonymous']);
+				]]>
 			</action>
 		</post>
 		
-		<put>
-			<description><![CDATA[Edit a flashcard, REST parameter: flashcard; POST parameters [title, question, answer]]]></description>
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				editFlashcard($_REST['flashcard'],$_POST['title'],$_POST['question'],$_POST['answer']);
-				]]>
-			</action>
-		</put>
+
 		
 		<delete>
 			<description><![CDATA[Delete a flashcard, REST parameter [flashcard]]]></description>
@@ -57,19 +132,284 @@
 
 	</command>
 
-	<command id='shuffle_flashcards' security='protected'>
-		<description><![CDATA[This API lets you shuffle flashcards]]></description>
+	<command id='edit_flashcard' security='protected'>
+		<description><![CDATA[This API lets you edit a flashcards]]></description>
+		<post>
+			<description><![CDATA[Edit a flashcard, POST parameters [id, question, answer, course_dept, course_code]]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				editFlashcard($_POST['id'],$_POST['question'],$_POST['answer'],$_POST['course_dept'],$_POST['course_code']);
+				]]>
+			</action>
+		</post>
+	</command>
+
+	<command id='upvote' security='protected'>
+		<description><![CDATA[This API lets you upvote a flashcard]]></description>
 		
 		<index>
-			<description><![CDATA[List all public flashcards]]></description>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Upvote a flashcard, POST parameter [flashcard_id]]]></description>
 			
 			<action file='gtflashcards.php'>
 				<![CDATA[
-				shuffleFlashcards();
+				upvote($_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='downvote' security='protected'>
+		<description><![CDATA[This API lets you downvote a flashcard]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Downvote a flashcard, POST parameter [flashcard_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				downvote($_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+
+	<command id='deck' security='protected'>
+		<description><![CDATA[This API lets you list your own decks]]></description>
+		
+		<index>
+			<description><![CDATA[List all decks for a user]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				listDecks();
 				]]>
 			</action>
 		</index>
+
 	</command>
+
+	<command id='cards_in_deck' security='protected'>
+		<description><![CDATA[This API lets you list flashcards in a specific deck]]></description>
+		
+		<index>
+			<description><![CDATA[If a deck is not specified, list flashcards for a user, incluing those not in any decks]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				cardsInAccount();
+				]]>
+			</action>
+		</index>
+
+		<post>
+			<description><![CDATA[List flashcards in a deck, POST parameter [deck_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				cardsInDeck($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='shuffle_deck' security='protected'>
+		<description><![CDATA[This API lets you shuffle flashcards in a specific deck]]></description>
+		
+		<index>
+			<description><![CDATA[Indexing is DISABLED, if a deck is not specified]]></description>
+			
+		</index>
+
+		<post>
+			<description><![CDATA[Shuffle flashcards in a deck, POST parameter [deck_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				shuffleDeck($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+
+	<command id='count_in_deck' security='protected'>
+		<description><![CDATA[This API lets you count the number of flashcards in a specific deck]]></description>
+		
+		<index>
+			<description><![CDATA[If a deck is not specified, count the flashcards in all decks]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				countInAllDecks();
+				]]>
+			</action>
+		</index>
+
+		<post>
+			<description><![CDATA[Count flashcards in a deck, POST parameter [deck_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				countInDeck($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='create_deck' security='protected'>
+		<description><![CDATA[This API lets you create your own deck]]></description>
+		<index>
+			<description><![CDATA[Indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Create a deck for a user, POST parameter [name]]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				createDeck($_POST[name]);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='rename_deck' security='protected'>
+		<description><![CDATA[This API lets you rename your own deck]]></description>
+		<index>
+			<description><![CDATA[Indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Rename a deck for a user, POST parameter [deck_id, new_name]]]></description>
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				renameDeck($_POST[deck_id],$_POST[new_name]);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+
+	<command id='delete_deck' security='protected'>
+		<description><![CDATA[This API lets you delete your own deck]]></description>
+		<index>
+			<description><![CDATA[Indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Delete a deck owned by a user, POST parameter [deck_id]]]></description>
+
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				deleteDeck($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='add_to_deck' security='protected'>
+		<description><![CDATA[This API lets you add a flashcard to a deck]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Add a flashcard to a deck, POST parameter [deck_id, flashcard_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				addToDeck($_POST['deck_id'],$_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+
+	</command>
+
+	<command id='remove_from_deck' security='protected'>
+		<description><![CDATA[This API lets you remove a flashcard from a deck]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Remove a flashcard from a deck, POST parameter [deck_id, flashcard_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				removeFromDeck($_POST['deck_id'],$_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+	</command>
+
+	<command id='is_known' security='protected'>
+		<description><![CDATA[This API lets you retrieve whether a flashcard in a deck is known to a user]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Get the "knwon" field of a flashcard, POST parameter [deck_id, flashcard_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				isKnown($_POST['deck_id'],$_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+	</command>
+
+	<command id='toggle_known' security='protected'>
+		<description><![CDATA[This API lets you toggle the "known" field of a flashcard in a deck]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Toggle the "knwon" field of a flashcard, POST parameter [deck_id, flashcard_id]]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				toggleKnown($_POST['deck_id'],$_POST['flashcard_id']);
+				]]>
+			</action>
+		</post>
+	</command>
+
+	<command id='reset_to_unknown' security='protected'>
+		<description><![CDATA[This API lets you reset "known" field to 0 of all flashcars in a deck]]></description>
+		
+		<index>
+			<description><![CDATA[indexing is DISABLED]]></description>
+		</index>
+
+		<post>
+			<description><![CDATA[Reset "knwon" field to of all flashcards in a deck, POST parameter [deck_id]]></description>
+			
+			<action file='gtflashcards.php'>
+				<![CDATA[
+				resetToUnknown($_POST['deck_id']);
+				]]>
+			</action>
+		</post>
+	</command>
+
 
 	<command id='tag' security='protected'>
 		<description><![CDATA[This API lets you list/create/delete tags]]></description>
@@ -89,7 +429,6 @@
 			
 			<action file='gtflashcards.php'>
 				<![CDATA[
-				print "POST";
 				createTag($_POST['label']);
 				]]>
 			</action>
@@ -106,7 +445,6 @@
 		</delete>
 
 	</command>
-
 
 	<command id='search_by_tag' security='protected'>
 		<description><![CDATA[This API lets you search flashcards by a tag]]></description>
@@ -172,134 +510,23 @@
 		</post>
 	</command>
 
-
-	<command id='deck' security='protected'>
-		<description><![CDATA[This API lets you list your own decks]]></description>
+	<command id='tags_of_card' security='protected'>
+		<description><![CDATA[This API lets you list tags of flashcard]]></description>
 		
 		<index>
-			<description><![CDATA[List all decks for a user]]></description>
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				listDecks();
-				]]>
-			</action>
+			<description><![CDATA[DISABLED]]></description>
 		</index>
-
-	</command>
-
-	<command id='cards_in_deck' security='protected'>
-		<description><![CDATA[This API lets you list flashcards in a specific deck]]></description>
 		
-		<index>
-			<description><![CDATA[Indexing is DISABLED, if a deck is not specified]]></description>
-			
-		</index>
-
 		<post>
-			<description><![CDATA[List flashcards in a deck, POST parameter [deck_id]]]></description>
-			
+			<description><![CDATA[List tags of a flashcard, POST parameter [flashcard_id]]]></description>
+
 			<action file='gtflashcards.php'>
 				<![CDATA[
-				cardsInDeck($_POST['deck_id']);
+				tagsOfCard($_POST['flashcard_id']);
 				]]>
 			</action>
 		</post>
 
 	</command>
-
-	<command id='shuffle_deck' security='protected'>
-		<description><![CDATA[This API lets you shuffle flashcards in a specific deck]]></description>
-		
-		<index>
-			<description><![CDATA[Indexing is DISABLED, if a deck is not specified]]></description>
-			
-		</index>
-
-		<post>
-			<description><![CDATA[Shuffle flashcards in a deck, POST parameter [deck_id]]]></description>
-			
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				shuffleDeck($_POST['deck_id']);
-				]]>
-			</action>
-		</post>
-
-	</command>
-
-
-	<command id='create_deck' security='protected'>
-		<description><![CDATA[This API lets you create your own deck]]></description>
-		<index>
-			<description><![CDATA[Indexing is DISABLED]]></description>
-		</index>
-
-		<post>
-			<description><![CDATA[Create a deck for a user, POST parameter [name]]]></description>
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				createDeck($_POST[name]);
-				]]>
-			</action>
-		</post>
-
-	</command>
-
-
-	<command id='delete_deck' security='protected'>
-		<description><![CDATA[This API lets you delete your own deck]]></description>
-		<index>
-			<description><![CDATA[Indexing is DISABLED]]></description>
-		</index>
-
-		<post>
-			<description><![CDATA[Delete a deck owned by a user, POST parameter [deck_id]]]></description>
-
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				deleteDeck($_POST['deck_id']);
-				]]>
-			</action>
-		</post>
-
-	</command>
-
-	<command id='add_to_deck' security='protected'>
-		<description><![CDATA[This API lets you add a flashcard to a deck]]></description>
-		
-		<index>
-			<description><![CDATA[indexing is DISABLED]]></description>
-		</index>
-
-		<post>
-			<description><![CDATA[Add a flashcard to a deck, POST parameter [deck_id, flashcard_id]]]></description>
-			
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				addToDeck($_POST['deck_id'],$_POST['flashcard_id']);
-				]]>
-			</action>
-		</post>
-
-	</command>
-
-	<command id='remove_from_deck' security='protected'>
-		<description><![CDATA[This API lets you remove a flashcard from a deck]]></description>
-		
-		<index>
-			<description><![CDATA[indexing is DISABLED]]></description>
-		</index>
-
-		<post>
-			<description><![CDATA[Remove a flashcard from a deck, POST parameter [deck_id, flashcard_id]]]></description>
-			
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				removeFromDeck($_POST['deck_id'],$_POST['flashcard_id']);
-				]]>
-			</action>
-		</post>
-	</command>
-
 
 </api>

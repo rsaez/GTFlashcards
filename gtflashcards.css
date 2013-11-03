@@ -1,34 +1,41 @@
 
-#cardContent {
+.flashcard-content {
 	text-align: center;
+	position: fixed;
+	top: 80px;
+	bottom: 100px;
+	left: 0;
+	right: 0;
 }
-#tags {
+
+.known-button {
+	bottom: 50px;
+	right: 50px;
+	position: fixed;
+}
+
+.flashcard-info {
+	font-size: small;
 	color: #aaa;
-	font-size: 12px;
+}
+.bottom-pane {
+	position: fixed;
+	bottom: 50px;
 }
 
-#filter_panel .ui-li-static {
-	padding: 0;
-}
-#filter_panel .ui-controlgroup {
-	margin: 0;
-}
-
-#flashcardListPane  {
-	margin-top: 15px;
+.flashcard_question, .flashcard_answer {
+	top: 30%;
+	position: fixed;
+	width: 100%;
+	color: #333;
 }
 
-#bottom_button_bar {
-	width: 80%;
-	margin: 0 auto;
+#breadcrumbs {
+	margin-bottom: 30px;
 }
 
-#options_popup {
-	min-width: 180px;
-}
-
-#filter_button {
-	margin-left: 0;
+#filter_list {
+	
 }
 
 .float-left {
@@ -36,4 +43,16 @@
 }
 .float-right {
 	float: right;
+}
+.my-hidden {
+	display: none;
+}
+
+@media all and (min-width: 450px){
+	.ui-field-contain label.ui-select { 
+		width: 22%;
+	}
+	.ui-field-contain label.ui-input-text  {
+		width: 22%;
+	}
 }
