@@ -45,13 +45,14 @@ foreign key (uid) references account(uid),
 flashcard_id int,
 foreign key (flashcard_id) references flashcard(id),
 known int,
-relation int
+relation int,
+anon boolean 
 );
 
 create table tag(
-#id int auto_increment primary key,
-label varchar(50) primary key,
-flashcard_id int
+label varchar(50),
+flashcard_id int,
+primary key(label, flashcard_id)
 );
 
 create table deck(

@@ -26,3 +26,11 @@ INNER JOIN `tagInCard` on tagInCard.tagid = tag.id and tagInCard.flashcardid = '
 
 #Use this to get the id of the table you just created
 SELECT LAST_INSERT_ID();
+
+SELECT * FROM `deck`
+INNER JOIN `deckOwnerShip` on deck.id = deckOwnerShip.deck_id
+INNER JOIN `Account` on  deckOwnerShip.uid = account.uid and account.uid = 'Sebastian';
+
+SELECT * from `flashcard`
+INNER JOIN `flashCardInDeck` on flashCardInDeck.flashcard_id = flashcard.id
+INNER JOIN `deck` on deck.id = flashCardInDeck.deck_id and deck.name = 'Sweden';
