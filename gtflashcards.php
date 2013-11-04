@@ -343,23 +343,6 @@
 		echo json_encode($result);
 	}
 
-<<<<<<< HEAD
-	function shuffleDeck($deck_id) {
-
-		checkDeckPermission($deck_id);
-
-		global $_USER;
-		$dbQuery = sprintf("SELECT id,title,question,answer FROM flashcard INNER JOIN deck_card_relation ON deck_id = '%s' AND flashcard_id = id",
-			mysql_real_escape_string($deck_id));
-
-		$result = getDBResultsArray($dbQuery);
-		shuffle($result);
-		header("Content-type: application/json");
-		echo json_encode($result);
-	}
-
-=======
->>>>>>> Uploading all files - v0.1
 	function createDeck($name) {
 		global $_USER;
 		$dbQuery = sprintf("INSERT INTO deck (name,uid) VALUES ('%s','%s')",
@@ -403,11 +386,19 @@
 		global $_USER;
 		$uid = $_USER["uid"];
 
-		$dbQuery = sprintf("INSERT INTO flashcardInDeck (deck_id,flashcard_id, known) VALUES ('%s','%s', 0)",
+		$dbQuery = sprintf("SELECT COUNT(*) AS count FROM flashcardInDeck WHERE deck_id = '%s' AND flashcard_id = '%s'",
 			mysql_real_escape_string($deck_id),
 			mysql_real_escape_string($flashcard_id));
 
-		$result = getDBResultInserted($dbQuery);
+		$result = getDBResultRecord($dbQuery);
+
+		if ($result["count"] == 0) {
+			$dbQuery = sprintf("INSERT INTO flashcardInDeck (deck_id,flashcard_id, known) VALUES ('%s','%s', 0)",
+				mysql_real_escape_string($deck_id),
+				mysql_real_escape_string($flashcard_id));
+
+			$result = getDBResultInserted($dbQuery);
+		}
 
 		header("Content-type: application/json");
 		echo json_encode($result);

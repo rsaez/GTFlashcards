@@ -17,6 +17,11 @@ var DECK_SECTION = 0;
 var TAG_SECTION = 1;
 var COURSE_SECTION = 2;
 
+var subset = 0; //0=all, 1=unknown, 2=known
+var ALL = 0;
+var UNKNOWN = 1;
+var KNOWN = 2
+
 var currentFlashcardPage = 1;
 
 $(document).bind("mobileinit", function(){
@@ -33,6 +38,8 @@ $(document).bind("mobileinit", function(){
 			courseDeptList.append($('<li>').append($('<a href="#cloud_course_code_page" onclick="setCurrentCourseDept('+i+')">').text(course_dept)));
 		}
 	});
+	
+	$('#edit_deck_dialog').dialog();
 });
 
 $(document).bind('pageinit', function() {
@@ -41,19 +48,15 @@ $(document).bind('pageinit', function() {
 	$('#my_decks_page').bind('pagebeforeshow',function(event, indata){
 		currentDeckIndex = -1;
 		section = 0;
-		if (!decks) {
-			downloadDecks(function() {
-				if(decks.length > 0) {
-					showDecks();
-				} else {
-					console.log('showing no decks message');
-					$('#noDecksPane').show();
-					$('#hasDecksPane').hide();
-				}
-			});
-		} else {
-			showDecks();
-		}
+		downloadDecks(function() {
+			if(decks.length > 0) {
+				showDecks();
+			} else {
+				console.log('showing no decks message');
+				$('#noDecksPane').show();
+				$('#hasDecksPane').hide();
+			}
+		});
 	});
 	
 	$('#deck_page').unbind();
@@ -86,13 +89,9 @@ $(document).bind('pageinit', function() {
 		section = 2;
 		
 		var courseDept = courseDepts[currentCourseDeptIndex];
-		//if(!courseDepts[currentCourseDeptIndex].codes) {
-			downloadCourseCodes(courseDept, function() {
-				showCourseCodes();
-			});
-		//} else {
-		//	showCourseCodes();
-		//}
+		downloadCourseCodes(courseDept, function() {
+			showCourseCodes();
+		});
 	});
 	
 	$('#cloud_course_code_flashcards_page').unbind();
@@ -100,39 +99,28 @@ $(document).bind('pageinit', function() {
 		var currentCourseCode = getCurrentCourseCode();
 		$('.course_code').text(currentCourseCode.code);
 		$('.course_full_code').text(currentCourseCode.dept+' '+currentCourseCode.code);
-		//todo: list all flashcards for this course code
 		$('.flashcard_list_row').remove();
-		if (!currentCourseCode.flashcards) {
-			downloadFlashcardsInCourse(currentCourseCode, function() {
-				showFlashcards($('#cloud_course_code_flashcards_page'), currentCourseCode.flashcards);
-			});
-		} else {
+		downloadFlashcardsInCourse(currentCourseCode, function() {
 			showFlashcards($('#cloud_course_code_flashcards_page'), currentCourseCode.flashcards);
-		}
+		});
 	});
 	
 	$('#cloud_tag_page').unbind();
 	$('#cloud_tag_page').bind('pagebeforeshow',function(event, indata){
 		currentTagIndex = -1;
 		section = 1;
-		if (!tags) {
-			downloadTags(function() {
-				showTags();
-			});
-		}
+		downloadTags(function() {
+			showTags();
+		});
 	});
 	
 	$('#cloud_tag_flashcards_page').unbind();
 	$('#cloud_tag_flashcards_page').bind('pagebeforeshow',function(event, indata){
 		$('.tag_name').text(tags[currentTagIndex].name);
 		$('.flashcard_list_row').remove();
-		if (!tags[currentTagIndex].flashcards) {
-			downloadFlashcardsInTag(currentTagIndex, function() {
-				showFlashcards($('#cloud_tag_flashcards_page'), tags[currentTagIndex].flashcards);
-			});
-		} else {
+		downloadFlashcardsInTag(currentTagIndex, function() {
 			showFlashcards($('#cloud_tag_flashcards_page'), tags[currentTagIndex].flashcards);
-		}
+		});
 	});
 	
 	
@@ -141,7 +129,8 @@ $(document).bind('pageinit', function() {
 		$('#newFlashcardQuestion').val('');
 		$('#newFlashcardAnswer').val('');
 		$('#newFlashcardTags').val('');
-		$('#newDeckSelect #firstOption').attr('selected','selected');
+		//$('#newDeckSelect #firstOption').attr('selected','selected');
+		$('#newDeckSelect option[value="'+currentDeckIndex+'"]').attr('selected','selected');
 		$('#newDeckSelect').selectmenu('refresh');
 		$('#newCourseCode').val('');
 		setCheckbox($('#newMakePublicCheckbox'), false);
@@ -154,27 +143,12 @@ $(document).bind('pageinit', function() {
 		if (currentFlashcard) {
 			$('#editFlashcardQuestion').val(currentFlashcard.question);
 			$('#editFlashcardAnswer').val(currentFlashcard.answer);
-			$('#editFlashcardTags').val(currentFlashcard.tags.join(', '));
+			$('#editFlashcardTags').val(currentFlashcard.tags.join(' '));
 			$('#editDeckSelect option[value="' + currentDeckIndex + '"]').attr('selected','selected');
 			$('#editDeckSelect').selectmenu('refresh');
 			$('#editCourseCode').val(currentFlashcard.course_dept+' '+currentFlashcard.course_code);
 			setCheckbox($('#editMakePublicCheckbox'), currentFlashcard.isPublic);
 			setCheckbox($('#editAnonymityCheckbox'), currentFlashcard.isAnonymous);
-			
-			/*var makePublicCheckbox = $('#editMakePublicCheckbox');
-			var anonymityCheckbox = $('#editAnonymityCheckbox');
-				
-			if (currentFlashcard.isPublic) {
-				setCheckbox(makePublicCheckbox, true);
-				if (currentFlashcard.isAnonymous) {
-					setCheckbox(anonymityCheckbox, true);
-				} else {
-					setCheckbox(anonymityCheckbox, false);
-				}
-			} else {
-				setCheckbox(makePublicCheckbox, false);
-				setCheckbox(anonymityCheckbox, false);
-			}*/
 		} else {
 			$('#editFlashcardQuestion').val('');
 			$('#editFlashcardAnswer').val('');
@@ -292,7 +266,7 @@ $(document).bind('pageinit', function() {
 	
 	$('#new_deck_dialog').unbind();
 	$('#new_deck_dialog').bind('pagebeforeshow',function(event, indata){
-		$('#newDeckName').text('');
+		$('#newDeckName').val('');
 	});
 	
 	$('#edit_deck_dialog').unbind();
@@ -312,19 +286,21 @@ function toggleFlashcardKnown() {
 		var flashcardId = currentFlashcard.id;
 		var deckId = decks[currentDeckIndex].id;
 		myAjax('POST', 'toggle_known', { flashcard_id:flashcardId, deck_id:deckId }, function() {
-			currentFlashcard.isKnown = !currentFlashcard.isKnown;
+			currentFlashcard.setKnown(!currentFlashcard.isKnown);
 			console.log('***successfully toggled flashcard known to '+currentFlashcard.isKnown);
+			updateCurrentFlashcardContent();
 		});
 	}
 }
 
 function setCheckbox(checkbox, setChecked) {
+	var label = checkbox.prev();
 	if (setChecked) {
-		checkbox.closest('.ui-icon').removeClass('ui-icon-checkbox-off').addClass('ui-icon-checkbox-on');
-		checkbox.closest('.ui-btn').removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
+		label.find('.ui-icon').removeClass('ui-icon-checkbox-off').addClass('ui-icon-checkbox-on');
+		label.removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
 	} else {
-		checkbox.closest('.ui-icon').removeClass('ui-icon-checkbox-on').addClass('ui-icon-checkbox-off');
-		checkbox.closest('.ui-btn').removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
+		label.find('.ui-icon').removeClass('ui-icon-checkbox-on').addClass('ui-icon-checkbox-off');
+		label.removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
 	}
 }
 
@@ -425,18 +401,12 @@ function showDecks() {
 		$('#editDeckSelect').append($('<option class="deck_option" value="'+i+'">').text(deck_name));
 		$('#saveDeckSelect').append($('<option class="deck_option" value="'+i+'">').text(deck_name));
 	}
-	if (allFlashcardsCount == -1) { //get the count for allFlashcards
-		myAjax('INDEX', 'count_in_deck', null, function(data) {
-			allFlashcardsCount = data[0].count;
-			$('#deck_list').append($('<li class="deck_list_row">').append($('<a href="#deck_page" onclick="setCurrentDeck(-1)">').text('All Flashcards').append($('<span class="ui-li-count">'+allFlashcardsCount+'</span>'))));				
-			$('#deck_list').listview('refresh');
-			$('#hasDecksPane').show();
-		});
-	} else {
+	myAjax('INDEX', 'count_in_deck', null, function(data) {
+		allFlashcardsCount = data[0].count;
 		$('#deck_list').append($('<li class="deck_list_row">').append($('<a href="#deck_page" onclick="setCurrentDeck(-1)">').text('All Flashcards').append($('<span class="ui-li-count">'+allFlashcardsCount+'</span>'))));				
 		$('#deck_list').listview('refresh');
 		$('#hasDecksPane').show();
-	}
+	});
 }
 
 function showTags() {
@@ -483,43 +453,63 @@ function removeFlashcardsFromDeck(flashcards, deckId, callback) {
 }
 
 function deleteFlashcards(flashcards, callback) {
+	console.log('***in deleteFlaschards, length='+flashcards.length);
 	if (flashcards.length == 0) {
 		callback();
 	} else {
 		var flashcard = flashcards.pop();
-		deleteFlashcard(flashcard.id, function() {
+		myAjax('DELETE', 'flashcard/'+flashcard.id, null, function(data) {
+			console.log('***successfully deleted flashcard');
 			deleteFlashcards(flashcards, callback);
 		});
 	}
 }
 
-
 function deleteDeck() {
 	if (currentDeckIndex > -1) {
 		var currentFlashcards = getCurrentFlashcards();
 		var deckId = decks[currentDeckIndex].id;
-		removeFlashcardsFromDeck(currentFlashcards.slice(0), deckId, function() {
+		if(currentFlashcards) {
+			removeFlashcardsFromDeck(currentFlashcards.slice(0), deckId, function() {
+				myAjax('POST', 'delete_deck', { 'deck_id' : deckId }, function(data) {
+					console.log('***successfully deleted deck, id='+deckId);
+					downloadDecks(function() {
+						showDecks();
+					});
+				});
+			});
+		} else {
 			myAjax('POST', 'delete_deck', { 'deck_id' : deckId }, function(data) {
-				console.log('successfully deleted deck, id='+currentDeckIndex);
+				console.log('***successfully deleted deck, id='+deckId);
 				downloadDecks(function() {
 					showDecks();
 				});
 			});
-		});
+		}
 	}
 }
 
 function deleteDeckAndFlashcards() {
 	if (currentDeckIndex > -1) {
 		var currentFlashcards = getCurrentFlashcards();
-		deleteFlashcards(currentFlashcards.slice(0), function() {
-			myAjax('POST', 'delete_deck', { 'deck_id' : decks[currentDeckIndex].id }, function(data) {
-				console.log('***successfully deleted deck, id='+currentDeckIndex);
+		var deckId = decks[currentDeckIndex].id;
+		if(currentFlashcards) {
+			deleteFlashcards(currentFlashcards.slice(0), function() {
+				myAjax('POST', 'delete_deck', { 'deck_id' : deckId }, function(data) {
+					console.log('***successfully deleted deck, id='+deckId);
+					downloadDecks(function() {
+						showDecks();
+					});
+				});
+			});
+		} else {
+			myAjax('POST', 'delete_deck', { 'deck_id' : deckId }, function(data) {
+				console.log('***successfully deleted deck, id='+deckId);
 				downloadDecks(function() {
 					showDecks();
 				});
 			});
-		});
+		}
 	}
 }
 
@@ -544,11 +534,14 @@ function goToFlashcard(index, pageNumber, rvrse) {
 	
 	//update content
 	currentFlashcardPage = pageNumber;
-	updateCurrentFlashcardContent(function() {
-		$.mobile.changePage($("#card_front_page_" + pageNumber), {
-			transition: 'slide',
-			reverse: rvrse,
-			reloadPage : true
+	
+	downloadFlashcard(currentFlashcards[currentFlashcardIndex].id, function() {
+		updateCurrentFlashcardContent(function() {
+			$.mobile.changePage($("#card_front_page_" + pageNumber), {
+				transition: 'slide',
+				reverse: rvrse,
+				reloadPage : true
+			});
 		});
 	});
 	
@@ -647,12 +640,19 @@ function shuffleFlashcards() {
 		currentFlashcards = decks[currentDeckIndex].flashcards;
 	}
 	
-	showFlashcards($('#deck_page'), currentFlashcards);
+	if (subset == KNOWN) {
+		showFlashcards($('#deck_page'), findKnownFlashcards(currentFlashcards));
+	} else if (subset == UNKNOWN) {
+		showFlashcards($('#deck_page'), findUnknownFlashcards(currentFlashcards));
+	} else if (subset == ALL) {
+		showFlashcards($('#deck_page'), currentFlashcards);
+	}
 }
 
 function downloadFlashcardsInDeck(deckIndex, callback) {
 	var flashcards = [];
-	myAjax('POST', 'cards_in_deck', { 'deck_id': decks[deckIndex].id }, function(data) {
+	var deckId = decks[deckIndex].id;
+	myAjax('POST', 'cards_in_deck', { 'deck_id': deckId }, function(data) {
 		//console.log('***imhere');
 		//console.log(data[0]);
 		for (var i = 0; i < data.length; i++) {
@@ -838,32 +838,75 @@ function editFlashcard() {
 	};
 	
 	myAjax('POST', 'edit_flashcard', editFlashcardData, function(data) {
-		console.log('successfully edited flashcard');
+		console.log('***successfully edited flashcard');
 		var newTags = findNewTags(currentFlashcard.tags, tags);
 		addTagsToFlashcard(flashcardId, newTags, function() {
 			if (deckIndex != currentDeckIndex) {
-				addFlashcardToDeck(flashcardId, decks[deckIndex].id, function() {
-					if (currentDeckIndex > -1) {
-						removeFlashcardFromDeck(flashcardId, decks[currentDeckIndex].id, function() {
-							currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
+				if (deckIndex > -1) {
+					addFlashcardToDeck(flashcardId, decks[deckIndex].id, function() {
+						if (currentDeckIndex > -1) {
+							removeFlashcardFromDeck(flashcardId, decks[currentDeckIndex].id, function() {
+								//currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
+								downloadFlashcard(flashcardId, function() {
+									$.mobile.changePage($("#deck_page"), {
+										transition:'slide',
+										reverse:true 
+									});
+								});
+							});
+						} else {
+							//currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
+							downloadFlashcard(flashcardId, function() {
+								$.mobile.changePage($("#deck_page"), {
+									transition:'slide',
+									reverse:true
+								});
+							});
+						}
+					});
+				} else {
+					removeFlashcardFromDeck(flashcardId, decks[currentDeckIndex].id, function() {
+						//currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
+						downloadFlashcard(flashcardId, function() {
 							$.mobile.changePage($("#deck_page"), {
 								transition:'slide',
 								reverse:true 
 							});
 						});
-					} else {
-						currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
-						$.mobile.changePage($("#deck_page"), {
-							transition:'slide',
-							reverse:true 
-						});
-					}
-				});
+					});
+				}
 			} else {
-				currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
-				updateCurrentFlashcardContent();
+				downloadFlashcard(flashcardId, function() {
+					updateCurrentFlashcardContent(function() {
+						//$('#edit_deck_dialog').dialog();
+						//$('#edit_deck_dialog').dialog('close');
+						//$('#edit_deck_dialog a[title=Close]').click();
+						history.back();
+					});
+				});
+				//currentFlashcard.update(question, answer, tags, course_dept, course_code, isPublic, isAnonymous);
+				//updateCurrentFlashcardContent();
 			}
 		});
+	});
+}
+
+function downloadFlashcard(flashcardId, callback) {
+	myAjax('GET', 'flashcard/'+flashcardId, null, function(data) {
+		console.log('***successfully downloaded flashcard');
+		var currentFlashcard = getCurrentFlashcard();
+		currentFlashcard.update(
+			decodeURIComponent(data.creator), 
+			decodeURIComponent(data.question), 
+			decodeURIComponent(data.answer), 
+			decodeURIComponent(data.course_dept), 
+			decodeURIComponent(data.course_code), 
+			data.upvotes, 
+			data.downvotes, 
+			data.isPublic, 
+			data.isAnonymous
+		);
+		callback();
 	});
 }
 
@@ -880,18 +923,15 @@ function findNewTags(previousTags, currentTags) {
 	return newTags;
 }
 
-function deleteFlashcard(flashcardId, callback) {
-	if(!flashcardId)
-		flashcardId = getCurrentFlashcard().id;
+function deleteFlashcard() {
+	var flashcardId = getCurrentFlashcard().id;
 	myAjax('DELETE', 'flashcard/'+flashcardId, null, function(data) {
 		console.log('***successfully deleted flashcard');
-		if (currentDeckIndex > -1) {
+		/*if (currentDeckIndex > -1) {
 			downloadFlashcardsInDeck(currentDeckIndex, function() {
 				showFlashcards($('#deck_page'), decks[currentDeckIndex].flashcards);
-				if(callback) 
-					callback();
 			});
-		}
+		}*/
 	});
 }
 
@@ -1028,14 +1068,17 @@ function myAjax(type, to, data, callback, ignoreNotFoundError) {
 }
 
 function parseTags(str) {
-	var tags = str.split(',');
+	var tags = str.split(' ');
 	for (var i = 0; i < tags.length; i++) {
-		tags[i] = tags[i].trim();
+		var tag = tags[i].trim();
+		if (tag != '')
+			tags[i] = tag;
 	}
 	return tags;
 }
 
 function showUnknownFlashcards() {
+	subset = UNKNOWN;
 	console.log('showing unknown flashcards');
 	//set radio to on
 	setRadioOff($('#radio_known'));
@@ -1048,6 +1091,7 @@ function showUnknownFlashcards() {
 }
 
 function showKnownFlashcards() {
+	subset = KNOWN;
 	console.log('showing known flashcards');
 	//set radio to on
 	setRadioOff($('#radio_unknown'));
@@ -1059,7 +1103,8 @@ function showKnownFlashcards() {
 	showFlashcards($('#deck_page'), knownFlashcards);
 }
 
-function showAllFlashcards() {
+function showAllFlashcards() {	
+	subset = ALL;
 	console.log('showing all flashcards');
 	//set radio to on
 	setRadioOff($('#radio_unknown'));
@@ -1132,18 +1177,24 @@ function Flashcard(id, creator, question, answer, course_dept, course_code, upvo
 	this.isAnonymous = isAnonymous;
 	this.isKnown = false;
 	
-	this.update = function(question, answer, tags, course_dept, course_code, isPublic, isAnonymous) {
+	this.update = function(creator, question, answer, course_dept, course_code, upvotes, downvotes, isPublic, isAnonymous) {
+		this.creator = creator;
 		this.question = question;
 		this.answer = answer;
-		this.tags = tags; //tags ? tags : [];
+		this.tags; //tags ? tags : [];
 		this.course_dept = course_dept;
 		this.course_code = course_code;
+		this.upvotes = upvotes;
+		this.downvotes = downvotes;
 		this.isPublic = isPublic;
 		this.isAnonymous = isAnonymous;
 	}
+	
+	this.setKnown = function(isKnown) {
+		this.isKnown = isKnown;
+	}
 }
 
-console.log('***updated');
 
 /* This function from http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript */
 //+ Jonas Raoni Soares Silva

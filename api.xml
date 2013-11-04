@@ -221,26 +221,6 @@
 
 	</command>
 
-	<command id='shuffle_deck' security='protected'>
-		<description><![CDATA[This API lets you shuffle flashcards in a specific deck]]></description>
-		
-		<index>
-			<description><![CDATA[Indexing is DISABLED, if a deck is not specified]]></description>
-			
-		</index>
-
-		<post>
-			<description><![CDATA[Shuffle flashcards in a deck, POST parameter [deck_id]]]></description>
-			
-			<action file='gtflashcards.php'>
-				<![CDATA[
-				shuffleDeck($_POST['deck_id']);
-				]]>
-			</action>
-		</post>
-
-	</command>
-
 
 	<command id='count_in_deck' security='protected'>
 		<description><![CDATA[This API lets you count the number of flashcards in a specific deck]]></description>
